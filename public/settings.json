@@ -1,0 +1,16 @@
+{
+    "tournaments":  [
+      { "title": "Skupinová A", "type": "pairs", "abbreviation": "skA", "priceMember": 500, "priceNonmember": 750, "evenings": 5 },
+      { "title": "Skupinová B", "type": "pairs", "abbreviation": "skB", "priceMember": 600, "priceNonmember": 800, "evenings": 9 },
+      { "title": "Pražská bridžová liga", "type": "teams", "abbreviation": "PBL", "basePrice": 4800, "discountPerMember": 100, "evenings": 10 },
+      { "title": "Švýcarkská skupinovka", "type": "pairs", "abbreviation": "skS", "priceMember": 700, "priceNonmember": 950, "evenings": 9 }
+    ],
+    "accNumberLegible": "2826735002/5500",
+    "membership": {
+      "price": 900,
+      "priceDiscounted": 350,
+      "priceCompetitive": 350,
+      "priceCompetitiveDiscounted": 150
+    },
+    "qrTemplate": "SPD*1.0*ACC:CZ3955000000002826735002*MSG:{msg}*AM:{am}*CC:CZK"
+}
