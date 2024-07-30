@@ -28,7 +28,6 @@
                 <p>Tato aplikace slouží pro vygenerování platebních údajů pro platbu členský příspěvků a vkladů do soutěží Bridžového klubu Praha.</p>
                 <p>Jednoduše vyplňte údaje - jméno, členství a které soutěže chcete uhradit, a platební údaje se objeví v pravém sloupci (dole, pokud jste na telefonu).</p>
                 <p>Spolu s platebními údaji je vygenerován QR kód, ten je možný použít k platbě v telefonu. Platbu lze ale také samozřejmě zadat ručně, stačí zkopírovat číslo účtu, částku a popis (na ten nezapomeňte).</p>
-
               </v-card-text>
             </v-card>
 
