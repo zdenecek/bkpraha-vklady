@@ -8,6 +8,7 @@ export type  PaymentOptions = {
     membership: MembershipPaymentOptions;
     accNumberLegible: string;
     qrTemplate: string;
+    activeYear: number;
 }
 
 export type MembershipPaymentOptions = {
@@ -21,6 +22,7 @@ export type TournamentPaymentOptions = ((GroupTournamentPaymentOptions & { type:
     title: string;
     abbreviation: string;
     evenings: number;
+    maxMembers: number;
 };
 
 export type GroupTournamentPaymentOptions = {

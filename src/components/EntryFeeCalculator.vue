@@ -11,7 +11,7 @@
           <v-radio-group v-model="selection.membership">
             <v-radio label="Jsem členem BKP" value="member"></v-radio>
             <v-radio label="Nejsem členem BKP" value="nonmember"></v-radio>
-            <v-radio label="Chci zaplatit členský příspěvek" value="pay"></v-radio>
+            <v-radio :label="'Chci zaplatit členský příspěvek za rok ' + paymentOptions.activeYear" value="pay"></v-radio>
           </v-radio-group>
           <template v-if="selection.membership === 'pay'">
             <v-radio-group v-model="selection.membershipType">
@@ -20,10 +20,6 @@
               </template>
               <v-radio :label="labelNormalMembership" value="normal"></v-radio>
               <v-radio :label="labelJuniorMembership" value="junior"></v-radio>
-            </v-radio-group>
-            <v-radio-group label="Na rok" v-model="selection.membershipYear">
-              <v-radio :label="thisYear.toString()" :value="thisYear"></v-radio>
-              <v-radio :label="(thisYear + 1).toString()" :value="thisYear + 1"></v-radio>
             </v-radio-group>
             <v-checkbox v-model="selection.membershipIncludeCompetitive">
               <template v-slot:label>
@@ -51,22 +47,22 @@
                 <v-checkbox hide-details="auto" v-model="selection.tournaments[i].selected">
                   <template v-slot:label>
                     <div class="label-tournament">
-                      <span class="title">{{ tournament.title }}</span>
-                      <span>{{ getTournamentPrice(i) }} Kč<span v-if="tournament.evenings > 1">, {{
+                      <span class="title">{{ tournament.title }}<span v-if="tournament.evenings > 1">, {{
             tournament.evenings }} kol</span></span>
+                      <span>{{ getTournamentPrice(i) }} Kč</span>
                     </div>
                   </template>
 
                 </v-checkbox>
                 <v-text-field  class="mt-4 team-selector" v-if="tournament.type === 'teams'"
                   v-show="selection.tournaments[i].selected" v-model="selection.tournaments[i].numberOfMembers"
-                  type="number" min="0" :max="maxMembers" label="Počet členů BKP v týmu" hide-details="auto" :rules="[v => v <= maxMembers || `Maximálně ${maxMembers} členové se počítají do slevy`]"
+                  type="number" min="0" :max="tournament.maxMembers" label="Počet členů BKP v týmu" hide-details="auto" :rules="[v => v <= tournament.maxMembers || `Maximálně ${tournament.maxMembers} členové se počítají do slevy`]"
                   variant="underlined" density="compact"></v-text-field>
                 <div v-if="tournament.type === 'pairs'" v-show="selection.tournaments[i].selected">
                   <v-checkbox v-model="selection.tournaments[i].payForPartner"  density="compact" :hide-details="true">
                     <template v-slot:label>
                       <div class="label-tournament">
-                        <span>Platím za partnera (+{{  getPartnerTournamentPrice(i) }} Kč)</span>
+                        <span>Platím i za partnera (+{{  getPartnerTournamentPrice(i) }} Kč)</span>
                         
                       </div>
                     </template>
@@ -131,13 +127,11 @@ type TournamentSelection = {
   payForPartner: boolean,
   partnerMember: boolean
 }
-const thisYear = new Date().getFullYear();
 const selection = ref({
   tournaments: [] as TournamentSelection[],
   membership: 'member' as 'member' | 'nonmember' | 'pay',
   membershipType: 'normal' as 'normal' | 'junior',
   membershipIncludeCompetitive: false,
-  membershipYear: thisYear,
   amount: 0,
   description: '',
   name: ''
@@ -149,12 +143,13 @@ const props = defineProps({
   }
 });
 
-const maxMembers = 4;
+
 
 
 const membership = computed(() => selection.value.membership !== 'nonmember');
 const labelNormalMembership = computed(() => `Normální (${props.paymentOptions.membership.price} Kč)`);
-const labelJuniorMembership = computed(() => `Juniorské, ročník 200x a mladší (${props.paymentOptions.membership.priceDiscounted} Kč)`);
+const lastJuniorYear = computed(() => props.paymentOptions.activeYear - 25);
+const labelJuniorMembership = computed(() => `Juniorské do 26 let - ročník narození ${lastJuniorYear.value} a mladší (${props.paymentOptions.membership.priceDiscounted} Kč)`);
 const competitivePrice = computed(() => selection.value.membershipType == 'junior' ? props.paymentOptions.membership.priceCompetitiveDiscounted : props.paymentOptions.membership.priceCompetitive);
 const baseMembershipPrice = computed(() => selection.value.membershipType == 'junior' ? props.paymentOptions.membership.priceDiscounted : props.paymentOptions.membership.price);
 const membershipPrice = computed(() => baseMembershipPrice.value + (selection.value.membershipIncludeCompetitive ? competitivePrice.value : 0));
@@ -173,7 +168,7 @@ function _getTournamentPrice(index: number, membership: boolean) {
     return membership ? tournament.priceMember : tournament.priceNonmember;
   } else {
     const membersCount = selection.value.tournaments[index].numberOfMembers ?? 0;
-    return tournament.basePrice - (tournament.discountPerMember * Math.min(membersCount, maxMembers));
+    return tournament.basePrice - (tournament.discountPerMember * Math.min(membersCount, tournament.maxMembers));
   }
 }
 
@@ -211,13 +206,13 @@ watch(calculatedAmount, (newVal) => {
 const generatedDescription = computed(() => {
   const names = props.paymentOptions.tournaments.map((t, i) => {
     if (selection.value.tournaments[i].selected) {
-      const members = Math.min(selection.value.tournaments[i].numberOfMembers ?? 0, maxMembers);
+      const members = Math.min(selection.value.tournaments[i].numberOfMembers ?? 0, t.maxMembers);
       return t.abbreviation + (t.type === 'teams' && members ? `-${members}` : '')
        + (t.type === 'pairs'  && selection.value.tournaments[i].payForPartner ? '-partner' : '');
     }
   }).filter(t => t);
   if (selection.value.membership === 'pay') {
-    names.push('členství-' + selection.value.membershipYear.toString().slice(2));
+    names.push('členství-' + props.paymentOptions.activeYear.toString().slice(2));
   }
   return `${selection.value.name} - ${names.join(', ')}`;
 })

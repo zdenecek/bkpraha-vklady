@@ -44,6 +44,7 @@
     </v-main>
     <v-footer>
       <span>&copy; {{ new Date().getFullYear() }} Bridžový klub Praha. Všechna práva vyhrazena.</span>
+      <span>{{ versionString }}</span>
     </v-footer>
   </v-app>
 </template>
@@ -61,6 +62,9 @@ fetch('./settings.json')
   .then(response => response.json())
   .then(data => options.value = data)
   .catch(error => console.error('Error loading settings', error));
+
+
+const versionString = (import.meta.env.VITE_APP_VERSION ?? '' as string) + ", " + (import.meta.env.VITE_BUILD_TIME ?? '' as string);
 
 </script>
 
