@@ -27,7 +27,6 @@ jobs:
           echo "VITE_APP_VERSION=${{ steps.package-version.outputs.current-version }}" > .env
           echo "VITE_BUILD_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> .env
       - name: Build
-        working-directory: ./frontend
         run: | 
           npm install
           npm run build --production
