@@ -11,20 +11,19 @@
           <v-radio-group v-model="selection.membership">
             <v-radio label="Jsem členem BKP" value="member"></v-radio>
             <v-radio label="Nejsem členem BKP" value="nonmember"></v-radio>
-            <v-radio :label="'Chci zaplatit členský příspěvek za rok ' + paymentOptions.activeYear" value="pay"></v-radio>
+            <v-radio :label="'Chci zaplatit členský příspěvek za rok ' + settings.activeYear" value="pay"></v-radio>
           </v-radio-group>
           <template v-if="selection.membership === 'pay'">
             <v-radio-group v-model="selection.membershipType">
               <template v-slot:label>
                 <span class="wrap">Členský příspěvek (včetně rekreačního členství v ČBS)</span>
               </template>
-              <v-radio :label="labelNormalMembership" value="normal"></v-radio>
-              <v-radio :label="labelJuniorMembership" value="junior"></v-radio>
+              <v-radio v-for=" _membership,i in memberships" :label="_membership.title" :value="i" :key="i"></v-radio>
             </v-radio-group>
             <v-checkbox v-model="selection.membershipIncludeCompetitive">
               <template v-slot:label>
                 <div class="label-tournament">
-                  <span>Soutěžní členství v ČBS (+{{ competitivePrice }} Kč)</span>
+                  <span>Soutěžní členství v ČBS (+{{ selectedMembership.priceCompetitive }} Kč)</span>
                   <span class="desc">Soutěžní členství je nutné pro účast na některých celostátních soutěžích a umožňuje
                     sběr soutěžních bodů (SB).
                     <a target="_blank" href="https://www.czechbridge.cz/union/437">Více informací zde</a>
@@ -42,7 +41,7 @@
         <v-card-text>
           <span>Chci zaplatit za následující soutěže</span>
           <v-form>
-            <div v-for=" tournament, i in paymentOptions.tournaments">
+            <div v-for=" tournament, i in settings.tournaments">
               <div class="tournament-outer">
                 <v-checkbox hide-details="auto" v-model="selection.tournaments[i].selected">
                   <template v-slot:label>
@@ -87,7 +86,7 @@
               <v-list-item-title>
                 Číslo účtu
               </v-list-item-title>
-              {{ paymentOptions.accNumberLegible }}
+              {{ settings.accNumberLegible }}
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
@@ -117,7 +116,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { PaymentOptions } from '@/model.ts';
+import { parseSettings, type PaymentOptions } from '@/model.ts';
 import DownloadableQrcode from '@/components/DownloadableQrcode.vue';
 
 
@@ -130,7 +129,7 @@ type TournamentSelection = {
 const selection = ref({
   tournaments: [] as TournamentSelection[],
   membership: 'member' as 'member' | 'nonmember' | 'pay',
-  membershipType: 'normal' as 'normal' | 'junior',
+  membershipType: 0,
   membershipIncludeCompetitive: false,
   amount: 0,
   description: '',
@@ -144,15 +143,15 @@ const props = defineProps({
 });
 
 
-
-
+const settings = computed(() => parseSettings(props.paymentOptions));
 const membership = computed(() => selection.value.membership !== 'nonmember');
-const labelNormalMembership = computed(() => `Normální (${props.paymentOptions.membership.price} Kč)`);
-const lastJuniorYear = computed(() => props.paymentOptions.activeYear - 25);
-const labelJuniorMembership = computed(() => `Juniorské do 26 let - ročník narození ${lastJuniorYear.value} a mladší (${props.paymentOptions.membership.priceDiscounted} Kč)`);
-const competitivePrice = computed(() => selection.value.membershipType == 'junior' ? props.paymentOptions.membership.priceCompetitiveDiscounted : props.paymentOptions.membership.priceCompetitive);
-const baseMembershipPrice = computed(() => selection.value.membershipType == 'junior' ? props.paymentOptions.membership.priceDiscounted : props.paymentOptions.membership.price);
-const membershipPrice = computed(() => baseMembershipPrice.value + (selection.value.membershipIncludeCompetitive ? competitivePrice.value : 0));
+const memberships = computed(() => settings.value.memberships);
+const selectedMembership = computed(() => memberships.value[selection.value.membershipType]);
+const membershipPrice = computed(() => {
+
+  if(selection.value.membership !== 'pay') return 0;
+  return  selectedMembership.value.price + (selection.value.membershipIncludeCompetitive ? selectedMembership.value.priceCompetitive : 0);
+})
 
 function getTournamentPrice(index: number) {
   return _getTournamentPrice(index, membership.value);
@@ -163,7 +162,7 @@ function getPartnerTournamentPrice(index: number) {
 }
 
 function _getTournamentPrice(index: number, membership: boolean) {
-  const tournament = props.paymentOptions.tournaments[index];
+  const tournament = settings.value.tournaments[index];
   if (tournament.type === 'pairs') {
     return membership ? tournament.priceMember : tournament.priceNonmember;
   } else {
@@ -173,7 +172,7 @@ function _getTournamentPrice(index: number, membership: boolean) {
 }
 
 function updateTournaments() {
-  selection.value.tournaments = props.paymentOptions.tournaments.map(_ => {
+  selection.value.tournaments = settings.value.tournaments.map(_ => {
     return {
       selected: false,
       numberOfMembers: membership.value ? 1 : 0,
@@ -182,7 +181,7 @@ function updateTournaments() {
     }
   });
 }
-watch(props.paymentOptions, () => updateTournaments());
+watch(settings, () => updateTournaments());
 updateTournaments();
 watch(membership, () => {
   selection.value.tournaments.forEach(t => {
@@ -191,20 +190,19 @@ watch(membership, () => {
   })
 })
 const calculatedAmount = computed(() => {
-  const tournamentsPrices = props.paymentOptions.tournaments.map((_, i) => {
+  const tournamentsPrices = settings.value.tournaments.map((_, i) => {
     if (selection.value.tournaments[i].selected) {
       return getTournamentPrice(i) + (selection.value.tournaments[i].payForPartner ? getPartnerTournamentPrice(i) : 0);
     }
     return 0;
   });
-  const memPrice = selection.value.membership === 'pay' ? membershipPrice.value : 0;
-  return tournamentsPrices.reduce((acc, val) => acc + val, memPrice);
+  return tournamentsPrices.reduce((acc, val) => acc + val, membershipPrice.value);
 })
 watch(calculatedAmount, (newVal) => {
   selection.value.amount = newVal;
 })
 const generatedDescription = computed(() => {
-  const names = props.paymentOptions.tournaments.map((t, i) => {
+  const names = settings.value.tournaments.map((t, i) => {
     if (selection.value.tournaments[i].selected) {
       const members = Math.min(selection.value.tournaments[i].numberOfMembers ?? 0, t.maxMembers);
       return t.abbreviation + (t.type === 'teams' && members ? `-${members}` : '')
@@ -212,14 +210,14 @@ const generatedDescription = computed(() => {
     }
   }).filter(t => t);
   if (selection.value.membership === 'pay') {
-    names.push('členství-' + props.paymentOptions.activeYear.toString().slice(2));
+    names.push((selectedMembership.value.description ?? "clenstvi") +'-' + settings.value.activeYear.toString().slice(2));
   }
   return `${selection.value.name} - ${names.join(', ')}`;
 })
 watch(generatedDescription, (newVal) => {
   selection.value.description = newVal;
 })
-const qrCodeValue = computed(() => props.paymentOptions.qrTemplate
+const qrCodeValue = computed(() => settings.value.qrTemplate
   .replace('{msg}', encodeURIComponent(selection.value.description))
   .replace('{am}', selection.value.amount.toFixed(2))
 );

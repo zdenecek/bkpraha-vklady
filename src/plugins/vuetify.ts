@@ -14,6 +14,11 @@ const vuetify = createVuetify({
       mdi,
     },
   },
+  defaults: {
+    VTextField: {
+      hideDetails: "auto",
+    }
+  }
 })
 
 export default vuetify

@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "qrcode.vue": "^3.4.1",
-    "vue": "^3.4.31"
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",

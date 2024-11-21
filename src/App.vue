@@ -19,28 +19,7 @@
       </v-app-bar-title>
     </v-app-bar>
     <v-main>
-      <v-container >
-        <v-row>
-          <v-col>
-            <v-card>
-              <v-card-title><h3>Úvod</h3></v-card-title>
-              <v-card-text class="intro">
-                <p>Tato aplikace slouží pro vygenerování platebních údajů pro platbu členský příspěvků a vkladů do soutěží Bridžového klubu Praha.</p>
-                <p>Jednoduše vyplňte údaje - jméno, členství a které soutěže chcete uhradit, a platební údaje se objeví v pravém sloupci (dole, pokud jste na telefonu).</p>
-                <p>Spolu s platebními údaji je vygenerován QR kód, ten je možný použít k platbě v telefonu. Platbu lze ale také samozřejmě zadat ručně, stačí zkopírovat číslo účtu, částku a popis (na ten nezapomeňte).</p>
-              </v-card-text>
-            </v-card>
-
-          </v-col>
-        </v-row>
-        <v-row  v-if="options === null" >
-         <v-col cols="12"> <v-skeleton-loader type="article" class="mt">
-        </v-skeleton-loader></v-col>
-          <v-col> <v-skeleton-loader type="article" class="mt">
-          </v-skeleton-loader></v-col>
-        </v-row>
-        <entry-fee-calculator v-else :payment-options="options"></entry-fee-calculator>
-      </v-container>
+      <router-view />
     </v-main>
     <v-footer>
       <span>&copy; {{ new Date().getFullYear() }} Bridžový klub Praha. Všechna práva vyhrazena.</span>
@@ -51,26 +30,11 @@
 
 <script setup lang="ts">
 import logo from './assets/logo.png';
-import EntryFeeCalculator from './components/EntryFeeCalculator.vue';
-import { ref, Ref } from 'vue';
-import type { PaymentOptions } from './model.ts';
-
-const options = ref(null) as Ref<PaymentOptions | null>;
-
-
-fetch('./settings.json')
-  .then(response => response.json())
-  .then(data => options.value = data)
-  .catch(error => console.error('Error loading settings', error));
-
-
+import { RouterView } from 'vue-router';
 const versionString = (import.meta.env.VITE_APP_VERSION ?? '' as string) + ", " + (import.meta.env.VITE_BUILD_TIME ?? '' as string);
-
 </script>
 
-
 <style scoped>
-
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 body {
