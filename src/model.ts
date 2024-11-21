@@ -1,4 +1,4 @@
-export type PaymentOptions = {
+export type FeeConfig = {
   tournaments: TournamentPaymentOptions[];
   memberships: MembershipPaymentOption[];
   accNumberLegible: string;
@@ -53,7 +53,7 @@ const cutoffs = getCutoffs(year);
   });
 }
 
-export function parseSettings(settings: PaymentOptions): PaymentOptions {
+export function parseSettings(settings: FeeConfig): FeeConfig {
   const memberships = settings.memberships.map((membership) => ({
     ...membership,
     title: formatMembershipTitle(membership.title, settings.activeYear),

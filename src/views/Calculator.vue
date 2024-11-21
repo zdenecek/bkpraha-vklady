@@ -19,16 +19,16 @@
           <v-col> <v-skeleton-loader type="article" class="mt">
           </v-skeleton-loader></v-col>
         </v-row>
-        <entry-fee-calculator v-else :payment-options="options"></entry-fee-calculator>
+        <entry-fee-calculator v-else :config="options"></entry-fee-calculator>
       </v-container>
 </template>
 
 <script setup lang="ts">
 import EntryFeeCalculator from '../components/EntryFeeCalculator.vue';
 import { ref, Ref } from 'vue';
-import type { PaymentOptions } from '../model.ts';
+import type { FeeConfig } from '../model.ts';
 
-const options = ref(null) as Ref<PaymentOptions | null>;
+const options = ref(null) as Ref<FeeConfig | null>;
 
 fetch('./settings.json')
   .then(response => response.json())

@@ -199,13 +199,13 @@
   </v-container>
 </template>
 
-<script lang="ts" setup>
-import { formatMembershipTitle, PaymentOptions } from "@/model";
+<script setup lang="ts" >
+import { formatMembershipTitle, FeeConfig } from "@/model";
 import { Ref, ref } from "vue";
 
 const isValid = ref(true);
 
-const settings = ref() as Ref<PaymentOptions | null>;
+const settings = ref() as Ref<FeeConfig | null>;
 
 fetch("./settings.json")
   .then((response) => response.json())
@@ -278,12 +278,14 @@ const saveJson = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .flex {
   display: flex;
   gap: 1em;
   margin-top: 1em;
+  flex-wrap: wrap;
 }
 
 .flex-grow {
