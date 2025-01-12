@@ -1,8 +1,8 @@
 <template>
     <div class="qr">
-        <qrcode-vue :value="qrCodeValue" :size="200" ref="qrcode"></qrcode-vue>
+        <qrcode-vue :value="qrCodeValue" :key="qrCodeValue" :size="200" ref="qrcode"></qrcode-vue>
         <v-btn  flat @click="downloadQRCode">Stáhnout QR kód</v-btn>
-        <v-btn  v-if="canShare" @click="shareQRCode">Sdílet QR kód</v-btn>
+        <v-btn  v-if="canShare" @click="shareQRCode" v-show="false">Sdílet QR kód</v-btn>
     </div>
 </template>
 

@@ -9,11 +9,11 @@
           <v-text-field
             label="Jméno"
             v-model="selection.name"
-            variant="underlined"
+            variant="outlined"
             density="comfortable"
             placeholder="zadejte jméno"
             persistent-placeholder
-            class="w-50"
+            class="w-50 mb-4"
           ></v-text-field>
           <v-radio-group v-model="selection.membership">
             <v-radio label="Jsem členem BKP" value="member"></v-radio>
@@ -45,7 +45,7 @@
                 <div class="label-tournament">
                   <span
                     >Soutěžní členství v ČBS (+{{
-                      selectedMembership.priceCompetitive
+                      selectedMembership?.priceCompetitive
                     }}
                     Kč)</span
                   >
@@ -92,7 +92,7 @@
                 <v-text-field
                   class="mt-4 team-selector"
                   v-if="tournament.type === 'teams'"
-                  v-show="selection.tournaments[i].selected"
+                  v-show="selection.tournaments[i]?.selected"
                   v-model="selection.tournaments[i].numberOfMembers"
                   type="number"
                   min="0"
@@ -104,12 +104,12 @@
                       v <= tournament.maxMembers ||
                       `Maximálně ${tournament.maxMembers} členové se počítají do slevy`,
                   ]"
-                  variant="underlined"
+                  variant="outlined"
                   density="compact"
                 ></v-text-field>
                 <div
                   v-if="tournament.type === 'pairs'"
-                  v-show="selection.tournaments[i].selected"
+                  v-show="selection.tournaments[i]?.selected"
                 >
                   <v-checkbox
                     v-model="selection.tournaments[i].payForPartner"
@@ -120,7 +120,7 @@
                       <div class="label-tournament">
                         <span
                           >Platím i za partnera (+{{
-                            getPartnerTournamentPrice(i)
+                            _getPartnerTournamentPrice(i)
                           }}
                           Kč)</span
                         >
@@ -154,8 +154,8 @@
             <v-list-item>
               <v-list-item-title> Částka </v-list-item-title>
               <v-text-field
-                v-model="selection.amount"
-                variant="underlined"
+                v-model.number="selection.amount"
+                variant="outlined"
                 density="compact"
                 hide-details
                 hide-spin-buttons
@@ -169,7 +169,7 @@
               <v-textarea
                 :rows="3"
                 v-model="selection.description"
-                variant="underlined"
+                variant="outlined"
                 density="compact"
                 :hide-details="true"
               ></v-textarea>
@@ -186,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onBeforeMount } from "vue";
 import { parseSettings, type FeeConfig } from "@/model.ts";
 import { useRoute, useRouter } from "vue-router";
 import DownloadableQrcode from "@/components/DownloadableQrcode.vue";
@@ -225,6 +225,11 @@ const selection = ref({
   name: "",
 });
 
+onBeforeMount(() => {
+  // Load data on component mount
+  loadFromUrl();
+});
+
 const loadFromUrl = () => {
   const query = route.query;
 
@@ -242,13 +247,17 @@ const loadFromUrl = () => {
 
   if (!query.amount) updateAmount();
   if (!query.description) updateDescription();
+
+  updateTournaments();
 };
 
 // Sync data to the URL whenever `selection` changes
 const syncToUrl = () => {
   const query: Record<string, string> = {
     ...route.query, // Preserve other unrelated query parameters
-    membership: selection.value.membership,
+    ...(selection.value.membership === "member"
+      ? {}
+      : { membership: selection.value.membership }),
     ...(selection.value.membership === "pay"
       ? {
           membershipType: selection.value.membershipType.toString(),
@@ -299,7 +308,18 @@ function getTournamentPrice(tournamentIndex: number) {
 function getPartnerTournamentPrice(tournamentIndex: number) {
   const tournament = selection.value.tournaments[tournamentIndex];
   if (!tournament.payForPartner) return 0;
-  return _getTournamentPrice(tournamentIndex, tournament.partnerMember ?? false);
+  return _getTournamentPrice(
+    tournamentIndex,
+    tournament.partnerMember ?? false
+  );
+}
+
+function _getPartnerTournamentPrice(tournamentIndex: number) {
+  const tournament = selection.value.tournaments[tournamentIndex];
+  return _getTournamentPrice(
+    tournamentIndex,
+    tournament.partnerMember ?? false
+  );
 }
 
 function _getTournamentPrice(tournamentIndex: number, membership: boolean) {
@@ -337,7 +357,7 @@ watch(membership, () => {
 
 const tournamentsPrices = computed(() =>
   configuration.value.tournaments.map((_, i) => {
-    if (selection.value.tournaments[i].selected) {
+    if (selection.value.tournaments[i]?.selected) {
       return (
         getTournamentPrice(i) +
         (selection.value.tournaments[i].payForPartner
@@ -357,18 +377,11 @@ const calculatedAmount = computed(() => {
   return _membershipPrice + _tournamentPrices.reduce((a, b) => a + b, 0);
 });
 
-
-function updateAmount() {
-  selection.value.amount = calculatedAmount.value;
-}
-watch(calculatedAmount, updateAmount);
-
-
 const generatedDescription = computed(() => {
   // Tournaments
   const tournamentAbbrvs = configuration.value.tournaments
     .map((t, i) => {
-      if (selection.value.tournaments[i].selected) {
+      if (selection.value.tournaments[i]?.selected) {
         const members = Math.min(
           selection.value.tournaments[i].numberOfMembers ?? 0,
           t.maxMembers
@@ -392,7 +405,9 @@ const generatedDescription = computed(() => {
         configuration.value.activeYear.toString().slice(2)
     );
   }
-
+  if (selection.value.name === "" && tournamentAbbrvs.length === 0) {
+    return "";
+  }
   return `${selection.value.name} - ${tournamentAbbrvs.join(", ")}`;
 });
 
@@ -400,12 +415,26 @@ function updateDescription() {
   selection.value.description = generatedDescription.value;
 }
 watch(generatedDescription, updateDescription);
+watch (()=>selection.value.description, updateQRCodeValue);
 
-const qrCodeValue = computed(() =>
-  configuration.value.qrTemplate
+function updateAmount() {
+  selection.value.amount = calculatedAmount.value;
+}
+watch(calculatedAmount, updateAmount);
+watch(()=>selection.value.amount, updateQRCodeValue);
+const qrCodeValue = ref("");
+
+function updateQRCodeValue() {
+  if(typeof selection.value.amount !== "number") return;
+  console.log("updating qr code value");
+  console.log(selection.value.amount)
+  const val = configuration.value.qrTemplate
     .replace("{msg}", encodeURIComponent(selection.value.description))
     .replace("{am}", selection.value.amount.toFixed(2))
-);
+  qrCodeValue.value = val;
+}
+updateQRCodeValue();
+
 </script>
 
 <style>
