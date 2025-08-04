@@ -1,73 +1,82 @@
 {
-  "tournaments": [
-    {
-      "title": "Skupinovka A",
-      "type": "pairs",
-      "abbreviation": "skA",
-      "priceMember": 500,
-      "priceNonmember": 750,
-      "evenings": 5
-    },
-    {
-      "title": "Skupinovka B",
-      "type": "pairs",
-      "abbreviation": "skB",
-      "priceMember": 600,
-      "priceNonmember": 900,
-      "evenings": 9
-    },
-    {
-      "title": "Švýcarská skupinovka, celá soutěž",
-      "type": "pairs",
-      "abbreviation": "skS",
-      "priceMember": 400,
-      "priceNonmember": 600,
-      "evenings": 5
-    },
-    {
-      "title": "Švýcarská skupinovka, jednotlivé kolo",
-      "type": "pairs",
-      "abbreviation": "skS-k",
-      "priceMember": 100,
-      "priceNonmember": 150,
-      "evenings": 1
-    },
-    {
-      "title": "Pražská bridžová liga",
-      "type": "teams",
-      "abbreviation": "PBL",
-      "basePrice": 9600,
-      "discountPerMember": 400,
-      "evenings": 14,
-      "maxMembers": 4
-    }
-  ],
-  "accNumberLegible": "2826735002/5500",
-  "memberships": [
-    {
-      "title": "Normální",
-      "description": "clenstvi",
-      "price": 1000,
-      "priceCompetitive": 2000
-    },
-    {
-      "title": "Juniorské - ročník { juniorCutoff } a mladší",
-      "description": "junior",
-      "price": 500,
-      "priceCompetitive": 100
-    },
-    {
-      "title": "Dorostenci - ročník { youngsterCutoff } a mladší",
-     "description": "dorost", 
-      "price": 120
-      , "priceCompetitive": 40
-    },
-    {
-      "title": "Žáci - ročník { kidCutoff } a starší",
-      "description": "zak",
-      "price": 10, "priceCompetitive": 5
-    }
-  ],
-  "activeYear": 2025,
-  "qrTemplate": "SPD*1.0*ACC:CZ3955000000002826735002*MSG:{msg}*AM:{am}*CC:CZK"
+    "tournaments": [
+	{
+            "title": "Úvodní Malá skupinovka (dobrovolný vklad)",
+            "type": "pairs",
+            "abbreviation": "MS",
+            "priceMember": 200,
+            "priceNonmember": 200,
+            "evenings": 1
+        },
+        {
+            "title": "Skupinovka A",
+            "type": "pairs",
+            "abbreviation": "skA",
+            "priceMember": 500,
+            "priceNonmember": 750,
+            "evenings": 5
+        },
+        {
+            "title": "Skupinovka B",
+            "type": "pairs",
+            "abbreviation": "skB",
+            "priceMember": 600,
+            "priceNonmember": 900,
+            "evenings": 9
+        },
+        {
+            "title": "Švýcarská skupinovka, celá soutěž",
+            "type": "pairs",
+            "abbreviation": "skS",
+            "priceMember": 400,
+            "priceNonmember": 600,
+            "evenings": 5
+        },
+        {
+            "title": "Švýcarská skupinovka, jednotlivé kolo",
+            "type": "pairs",
+            "abbreviation": "skS-k",
+            "priceMember": 100,
+            "priceNonmember": 150,
+            "evenings": 1
+        },
+        {
+            "title": "Pražská bridžová liga",
+            "type": "teams",
+            "abbreviation": "PBL",
+            "basePrice": 9600,
+            "discountPerMember": 400,
+            "evenings": 14,
+            "maxMembers": 4
+        }
+    ],
+    "accNumberLegible": "2826735002\/5500",
+    "memberships": [
+        {
+            "title": "Běžné",
+            "description": "clenstvi",
+            "price": 1000,
+            "priceCompetitive": 350
+        },
+        {
+            "title": "Juniorské - ročník { juniorCutoff } a mladší",
+            "description": "junior",
+            "price": 700,
+            "priceCompetitive": 100
+        },
+        {
+            "title": "Dorostenecké - ročník { youngsterCutoff } a mladší",
+            "description": "dorost",
+            "price": 450,
+            "priceCompetitive": 100
+        },
+        {
+            "title": "Žákovské - ročník { kidCutoff } a mladší",
+            "description": "zak",
+            "price": 200,
+            "priceCompetitive": 100
+        }
+    ],
+    "activeYear": 2025,
+    "qrTemplate": "SPD*1.0*ACC:CZ3955000000002826735002*MSG:{msg}*AM:{am}*CC:CZK"
 }

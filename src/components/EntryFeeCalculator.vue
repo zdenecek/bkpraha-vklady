@@ -129,6 +129,8 @@
                   </v-checkbox>
                   <v-checkbox
                     v-model="selection.tournaments[i].partnerMember"
+                    v-show="configuration.tournaments[i].type !== 'pairs' ||
+                     (configuration.tournaments[i].priceMember !== configuration.tournaments[i].priceNonmember)"
                     label="Partner je členem BKP"
                     density="compact"
                     :hide-details="true"
