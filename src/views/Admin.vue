@@ -17,7 +17,7 @@
               <v-col cols="12" md="2">
                 <!-- Active Year -->
                 <v-text-field
-                  v-model="settings.activeYear"
+                  v-model.number="settings.activeYear"
                   label="Aktivní rok"
                   type="number"
                 ></v-text-field>
@@ -77,37 +77,37 @@
                         label="Zkratka"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.priceMember"
+                        v-model.number="tournament.priceMember"
                         label="Cena člen"
                         type="number"
                         v-if="tournament.type === 'pairs'"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.priceNonmember"
+                        v-model.number="tournament.priceNonmember"
                         label="Cena nečlen"
                         type="number"
                         v-if="tournament.type === 'pairs'"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.basePrice"
+                        v-model.number="tournament.basePrice"
                         label="Zakladní cena"
                         type="number"
                         v-if="tournament.type === 'teams'"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.discountPerMember"
+                        v-model.number="tournament.discountPerMember"
                         label="Sleva na člena"
                         type="number"
                         v-if="tournament.type === 'teams'"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.maxMembers"
+                        v-model.number="tournament.maxMembers"
                         label="Max členů"
                         type="number"
                         v-if="tournament.type === 'teams'"
                       ></v-text-field>
                       <v-text-field
-                        v-model="tournament.evenings"
+                        v-model.number="tournament.evenings"
                         label="Večerů"
                         type="number"
                       ></v-text-field>
@@ -165,12 +165,12 @@
                         label="Popis v textu platby"
                       ></v-text-field>
                       <v-text-field
-                        v-model="membership.price"
+                        v-model.number="membership.price"
                         label="Cena"
                         type="number"
                       ></v-text-field>
                       <v-text-field
-                        v-model="membership.priceCompetitive"
+                        v-model.number="membership.priceCompetitive"
                         label="Příplatek za soutěžní"
                         type="number"
                       ></v-text-field>

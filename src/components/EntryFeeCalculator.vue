@@ -93,7 +93,7 @@
                   class="mt-4 team-selector"
                   v-if="tournament.type === 'teams'"
                   v-show="selection.tournaments[i]?.selected"
-                  v-model="selection.tournaments[i].numberOfMembers"
+                  v-model.number="selection.tournaments[i].numberOfMembers"
                   type="number"
                   min="0"
                   :max="tournament.maxMembers"

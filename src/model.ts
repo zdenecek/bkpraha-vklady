@@ -53,14 +53,46 @@ const cutoffs = getCutoffs(year);
   });
 }
 
+const tournamentNumericFields = [
+  "priceMember",
+  "priceNonmember",
+  "basePrice",
+  "discountPerMember",
+  "evenings",
+  "maxMembers",
+];
+
+const membershipNumericFields = ["price", "priceCompetitive"];
+
+// The admin form stores every field it edits as a string, so a price can come
+// back from settings.json as "800". Adding those with + concatenates them.
+function withNumericFields<T>(item: T, fields: string[]): T {
+  const result = { ...item } as Record<string, unknown>;
+  for (const field of fields) {
+    const value = result[field];
+    if (value !== undefined && value !== null && value !== "") {
+      result[field] = Number(value);
+    }
+  }
+  return result as T;
+}
+
 export function parseSettings(settings: FeeConfig): FeeConfig {
+  const activeYear = Number(settings.activeYear);
+
+  const tournaments = settings.tournaments.map((tournament) =>
+    withNumericFields(tournament, tournamentNumericFields)
+  );
+
   const memberships = settings.memberships.map((membership) => ({
-    ...membership,
-    title: formatMembershipTitle(membership.title, settings.activeYear),
+    ...withNumericFields(membership, membershipNumericFields),
+    title: formatMembershipTitle(membership.title, activeYear),
   }));
 
   return {
     ...settings,
+    activeYear,
+    tournaments,
     memberships,
   };
 }
