@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - src/**
+      - public/**
+      - index.html
+      - package.json
+      - .github/workflows/deploy.yml
     branches:
       - main
   workflow_dispatch:
