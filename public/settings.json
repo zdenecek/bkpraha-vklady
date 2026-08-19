@@ -1,6 +1,6 @@
 {
     "tournaments": [
-	{
+        {
             "title": "Úvodní Malá skupinovka (dobrovolný vklad)",
             "type": "pairs",
             "abbreviation": "MS",
@@ -25,32 +25,47 @@
             "evenings": 9
         },
         {
-            "title": "Švýcarská skupinovka, celá soutěž",
-            "type": "pairs",
-            "abbreviation": "skS",
-            "priceMember": 400,
-            "priceNonmember": 600,
-            "evenings": 5
-        },
-        {
-            "title": "Švýcarská skupinovka, jednotlivé kolo",
-            "type": "pairs",
-            "abbreviation": "skS-k",
-            "priceMember": 100,
-            "priceNonmember": 150,
-            "evenings": 1
+            "title": "Pražská bridžová liga",
+            "type": "teams",
+            "abbreviation": "PBL11",
+            "basePrice": 9900,
+            "discountPerMember": 825,
+            "evenings": 11,
+            "maxMembers": 4
         },
         {
             "title": "Pražská bridžová liga",
             "type": "teams",
-            "abbreviation": "PBL",
-            "basePrice": 9600,
-            "discountPerMember": 400,
-            "evenings": 14,
+            "abbreviation": "PBL13",
+            "basePrice": 11700,
+            "discountPerMember": 975,
+            "evenings": 13,
+            "maxMembers": 4
+        },
+        {
+            "title": "Impový přebor BK Praha",
+            "type": "pairs",
+            "abbreviation": "IMP",
+            "priceMember": 800,
+            "priceNonmember": 1200,
+            "evenings": 10,
+            "discountPerMember": 0,
+            "basePrice": 0,
+            "maxMembers": 4
+        },
+        {
+            "title": "Topový přebor BK Praha",
+            "type": "pairs",
+            "abbreviation": "TOP",
+            "priceMember": 800,
+            "priceNonmember": 1200,
+            "evenings": 10,
+            "discountPerMember": 0,
+            "basePrice": 0,
             "maxMembers": 4
         }
     ],
-    "accNumberLegible": "2826735002\/5500",
+    "accNumberLegible": "2826735002/5500",
     "memberships": [
         {
             "title": "Běžné",
@@ -77,6 +92,6 @@
             "priceCompetitive": 100
         }
     ],
-    "activeYear": 2025,
+    "activeYear": 2026,
     "qrTemplate": "SPD*1.0*ACC:CZ3955000000002826735002*MSG:{msg}*AM:{am}*CC:CZK"
 }
