@@ -2,8 +2,12 @@
 // Set the response header to return JSON
 header('Content-Type: application/json');
 
-// Define the password (replace with a secure password)
-define('PASSWORD', 'securepassword');
+// The deploy workflow writes this file from the ADMIN_PASSWORD secret.
+// It is not in the repository.
+$passwordFile = __DIR__ . '/admin-password.php';
+if (is_readable($passwordFile)) {
+    require_once $passwordFile;
+}
 
 // Path to the JSON file
 define('JSON_FILE', 'settings.json');
@@ -24,8 +28,14 @@ try {
     // Decode the request payload
     $input = json_decode(file_get_contents('php://input'), true);
 
+    // Refuse to authenticate at all rather than accept an empty password
+    if (!defined('ADMIN_PASSWORD') || ADMIN_PASSWORD === '') {
+        sendResponse(500, 'Admin password is not configured on the server');
+    }
+
     // Validate the request payload
-    if (!isset($input['password']) || $input['password'] !== PASSWORD) {
+    if (!isset($input['password']) || !is_string($input['password'])
+        || !hash_equals(ADMIN_PASSWORD, $input['password'])) {
         sendResponse(403, 'Unauthorized: Invalid password');
     }
 

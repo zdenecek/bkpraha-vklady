@@ -34,6 +34,19 @@ jobs:
         run: | 
           npm install
           npm run build --production
+      - name: Write admin password
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          if [ -z "$ADMIN_PASSWORD" ]; then
+            echo "::error::secret ADMIN_PASSWORD is not set"
+            exit 1
+          fi
+          # base64 so no quoting in the password can break the generated PHP
+          printf '<?php\ndefine("ADMIN_PASSWORD", base64_decode("%s"));\n' \
+            "$(printf '%s' "$ADMIN_PASSWORD" | base64 -w0)" > dist/admin-password.php
+      - name: Keep the settings.json that is on the server
+        run: rm -f dist/settings.json
       - name: Upload via FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
